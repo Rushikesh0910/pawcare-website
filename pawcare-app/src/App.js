@@ -5,9 +5,16 @@ import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCust
 
 // --- Helper Functions & Configuration ---
 
-// These variables are provided by the environment. Do not change them.
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+// PASTE YOUR FIREBASE CONFIG OBJECT HERE
+const firebaseConfig = {
+  apiKey: "AIzaSyD38JKcmqITmGUXN-9j9VRkIxRsdyGP3fs",
+  authDomain: "pawcare-984fd.firebaseapp.com",
+  projectId: "pawcare-984fd",
+  storageBucket: "pawcare-984fd.firebasestorage.app",
+  messagingSenderId: "921796152720",
+  appId: "1:921796152720:web:27161a12d63a03d134b715",
+  measurementId: "G-6ZP58JYZM2"
+};
 
 // Initialize Firebase
 let app;
@@ -166,17 +173,10 @@ export default function App() {
 
         const initAuth = async () => {
             try {
-                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                if (initialToken) {
-                    await signInWithCustomToken(auth, initialToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // For a standard web deployment, we will just sign in anonymously.
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Authentication Error:", error);
-                if (error.code === 'auth/custom-token-mismatch') {
-                    await signInAnonymously(auth);
-                }
             }
         };
 
@@ -202,6 +202,7 @@ export default function App() {
         }
         
         const userId = user.uid;
+        const appId = firebaseConfig.appId; // Use appId from your config
         setIsLoading(true);
         
         const dogsCollectionPath = `artifacts/${appId}/users/${userId}/dogs`;
@@ -236,6 +237,7 @@ export default function App() {
             orderDate: new Date()
         };
 
+        const appId = firebaseConfig.appId; // Use appId from your config
         const productOrdersCollectionPath = `artifacts/${appId}/public/data/productOrders`;
         try {
             await addDoc(collection(db, productOrdersCollectionPath), order);
@@ -385,9 +387,9 @@ function Footer() {
 }
 
 const WhatsAppButton = () => (
-    <a 
+    <a
         href="https://wa.me/919825664405" // Replace with your WhatsApp number
-        target="_blank" 
+        target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-24 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-transform hover:scale-110 z-50"
         aria-label="Contact on WhatsApp"
@@ -588,12 +590,12 @@ function DogCard({ dog, navigateTo }) {
     return (
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer group" onClick={() => navigateTo('dogProfile', dog)}>
             <div className="relative overflow-hidden">
-                <img 
-                    src={dog.gallery?.[0] || `https://placehold.co/400x300/FDF6E9/63372C?text=Image+Coming+Soon`} 
-                    alt={dog.name} 
+                <img
+                    src={dog.gallery?.[0] || `https://placehold.co/400x300/FDF6E9/63372C?text=Image+Coming+Soon`}
+                    alt={dog.name}
                     className={`w-full h-56 object-cover transition-all duration-500 ease-in-out group-hover:scale-110 ${isLoaded ? 'blur-0' : 'blur-md'}`}
                     onLoad={() => setIsLoaded(true)}
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/CCCCCC/FFFFFF?text=Image+Error'; }} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/CCCCCC/FFFFFF?text=Image+Error'; }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
                 </div>
@@ -648,6 +650,7 @@ function DogProfilePage({ dog, navigateTo, userId, favorites, showAlert }) {
         setIsAnimatingHeart(true);
         setTimeout(() => setIsAnimatingHeart(false), 300);
 
+        const appId = firebaseConfig.appId; // Use appId from your config
         const favoriteDocPath = `artifacts/${appId}/users/${userId}/favorites/${dog.id}`;
         try {
             if (isFavorited) {
@@ -684,9 +687,9 @@ function DogProfilePage({ dog, navigateTo, userId, favorites, showAlert }) {
                         {/* Image Column */}
                         <div className="p-4 sm:p-6">
                             <div className="relative overflow-hidden rounded-xl shadow-lg">
-                                <img 
-                                    src={dog.gallery[currentIndex]} 
-                                    alt={dog.name} 
+                                <img
+                                    src={dog.gallery[currentIndex]}
+                                    alt={dog.name}
                                     className={`w-full h-96 object-cover transition-all duration-500 ease-in-out ${isImageLoaded ? 'blur-0' : 'blur-md'}`}
                                      onLoad={() => setIsImageLoaded(true)}
                                 />
@@ -704,7 +707,7 @@ function DogProfilePage({ dog, navigateTo, userId, favorites, showAlert }) {
                             </div>
                             <div className="grid grid-cols-5 gap-2 sm:gap-4 mt-4">
                                 {(dog.gallery || []).map((img, index) => (
-                                    <img 
+                                    <img
                                         key={index}
                                         src={img}
                                         alt={`${dog.name} ${index + 1}`}
@@ -823,6 +826,7 @@ function PurchaseModal({ dog, closeModal, navigateTo, userId, showAlert }) {
         };
 
         try {
+            const appId = firebaseConfig.appId; // Use appId from your config
             const inquiriesCollectionPath = `artifacts/${appId}/users/${userId}/inquiries`;
             await addDoc(collection(db, inquiriesCollectionPath), inquiryData);
             closeModal();
@@ -891,12 +895,12 @@ function MatchmakingPage({ dogs, navigateTo }) {
             scoredDogs = availableDogs.map(dog => {
                 let score = 0;
                 // Activity level match
-                if (preferences.activityLevel === dog.activity) { score += 40; } 
-                else if (preferences.activityLevel === 'high' && dog.activity === 'medium') { score += 15; } 
+                if (preferences.activityLevel === dog.activity) { score += 40; }
+                else if (preferences.activityLevel === 'high' && dog.activity === 'medium') { score += 15; }
                 else if (preferences.activityLevel === 'low' && dog.activity === 'medium') { score += 15; }
 
                 // Kids match
-                if (preferences.hasKids === 'yes' && (dog.temperament.includes('friendly') || dog.temperament.includes('loving') || dog.temperament.includes('gentle'))) { score += 30; } 
+                if (preferences.hasKids === 'yes' && (dog.temperament.includes('friendly') || dog.temperament.includes('loving') || dog.temperament.includes('gentle'))) { score += 30; }
                 else if (preferences.hasKids === 'no') { score += 10; }
 
                 // Home size match
@@ -1014,6 +1018,7 @@ function ClientDashboard({ userId, favoritedDogs, purchasedDogs, productOrders, 
         if (!userId || !feedback || !db) return;
         
         try {
+            const appId = firebaseConfig.appId; // Use appId from your config
             const feedbackCollectionPath = `artifacts/${appId}/users/${userId}/feedback`;
             await addDoc(collection(db, feedbackCollectionPath), {
                 feedback: feedback,
@@ -1120,13 +1125,13 @@ function ClientDashboard({ userId, favoritedDogs, purchasedDogs, productOrders, 
                 <div className="bg-white p-6 rounded-xl shadow-lg">
                     <h2 className="text-2xl font-bold text-[#63372C] mb-4">Leave Feedback</h2>
                     <form onSubmit={handleFeedbackSubmit}>
-                        <textarea 
+                        <textarea
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
-                            placeholder="Tell us about your experience..." 
-                            rows="4" 
-                            className="w-full p-3 border border-gray-300 rounded-lg mb-4" 
-                            required 
+                            placeholder="Tell us about your experience..."
+                            rows="4"
+                            className="w-full p-3 border border-gray-300 rounded-lg mb-4"
+                            required
                         />
                         <PeekingButton type="submit" className="w-full bg-[#8B4513] text-white py-2 rounded-lg font-semibold hover:bg-[#63372C]">Submit Feedback</PeekingButton>
                         {feedbackMessage && <p className="mt-4 text-center text-green-600">{feedbackMessage}</p>}
@@ -1142,7 +1147,7 @@ function ClientDashboard({ userId, favoritedDogs, purchasedDogs, productOrders, 
                     <div className="bg-amber-50 p-3 rounded-lg text-center font-mono text-[#63372C] break-all">
                         {userId}
                     </div>
-                    <PeekingButton 
+                    <PeekingButton
                         onClick={() => {
                             navigator.clipboard.writeText(userId);
                             showAlert('Referral code copied to clipboard!');
@@ -1182,6 +1187,7 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
         setConfirmAction(() => async () => {
             if (!userId || !db) return;
             try {
+                const appId = firebaseConfig.appId; // Use appId from your config
                 const dogDocPath = `artifacts/${appId}/users/${userId}/dogs/${dogId}`;
                 await deleteDoc(doc(db, dogDocPath));
                 setMessage("Dog listing deleted successfully.");
@@ -1196,6 +1202,7 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
     const addSampleDogs = async () => {
         if (!userId || !db) { setMessage('Error: You must be logged in to add dogs.'); return; }
         setMessage('Adding sample dogs...');
+        const appId = firebaseConfig.appId; // Use appId from your config
         const dogsCollectionPath = `artifacts/${appId}/users/${userId}/dogs`;
         const collectionRef = collection(db, dogsCollectionPath);
         const existingDocs = await getDocs(collectionRef);
@@ -1211,6 +1218,7 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
         setConfirmAction(() => async () => {
             if (!userId || !db) { setMessage('Error: You must be logged in to clear dogs.'); return; }
             setMessage('Clearing all dogs...');
+            const appId = firebaseConfig.appId; // Use appId from your config
             const dogsCollectionPath = `artifacts/${appId}/users/${userId}/dogs`;
             const collectionRef = collection(db, dogsCollectionPath);
             const querySnapshot = await getDocs(collectionRef);
@@ -1228,6 +1236,7 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
     
     const toggleFeaturedReview = async (review) => {
         if (!db) return;
+        const appId = firebaseConfig.appId; // Use appId from your config
         const reviewDocPath = `artifacts/${appId}/public/data/reviews/${review.id}`;
         try {
             await updateDoc(doc(db, reviewDocPath), { isFeatured: !review.isFeatured });
@@ -1272,8 +1281,8 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
                                     <div className="mb-2 sm:mb-0">
                                         <p className="font-bold text-lg">{dog.name} <span className="font-normal text-gray-600">({dog.breed})</span></p>
                                         <span className={`text-sm font-semibold px-2 py-0.5 rounded-full ${
-                                            dog.status === 'Sold' ? 'bg-red-200 text-red-800' : 
-                                            dog.status === 'In Training' ? 'bg-yellow-200 text-yellow-800' : 
+                                            dog.status === 'Sold' ? 'bg-red-200 text-red-800' :
+                                            dog.status === 'In Training' ? 'bg-yellow-200 text-yellow-800' :
                                             'bg-green-200 text-green-800'
                                         }`}>{dog.status}</span>
                                     </div>
@@ -1427,6 +1436,7 @@ function DogFormModal({ dog, closeModal, userId, showAlert }) {
         };
 
         try {
+            const appId = firebaseConfig.appId; // Use appId from your config
             if (dog) { // Editing existing dog
                 const dogDocPath = `artifacts/${appId}/users/${userId}/dogs/${dog.id}`;
                 await updateDoc(doc(db, dogDocPath), dogData);
@@ -1513,6 +1523,7 @@ function CheckoutPage({ checkoutInfo, navigateTo, userId }) {
         if (!userId || !dog || !db) return;
 
         // 1. Mark the dog as "Sold"
+        const appId = firebaseConfig.appId; // Use appId from your config
         const dogDocPath = `artifacts/${appId}/users/${userId}/dogs/${dog.id}`;
         await updateDoc(doc(db, dogDocPath), { status: 'Sold' });
 
@@ -1624,6 +1635,7 @@ function ReviewModal({ dog, closeModal, userId, showAlert }) {
 
         try {
             // Reviews are public, so they are stored in a public collection
+            const appId = firebaseConfig.appId; // Use appId from your config
             const reviewsCollectionPath = `artifacts/${appId}/public/data/reviews`;
             await addDoc(collection(db, reviewsCollectionPath), reviewData);
             closeModal();
@@ -1793,28 +1805,28 @@ function OurProcessPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <FadeIn>
-                    <ProcessStep 
+                    <ProcessStep
                         icon={<svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>}
                         title="Step 1: Expert Sourcing"
                         description="We partner with reputable and ethical breeders to ensure our dogs come from healthy and humane environments."
                     />
                 </FadeIn>
                 <FadeIn>
-                    <ProcessStep 
+                    <ProcessStep
                         icon={<svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
                         title="Step 2: Health & Wellness"
                         description="Every dog undergoes a comprehensive vet check, is fully vaccinated, and dewormed. Their health is our top priority."
                     />
                 </FadeIn>
                 <FadeIn>
-                     <ProcessStep 
+                     <ProcessStep
                         icon={<svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>}
                         title="Step 3: Professional Training"
                         description="Our dogs begin basic obedience and socialization training to ensure they are well-behaved and ready to integrate into your home."
                     />
                 </FadeIn>
                 <FadeIn>
-                     <ProcessStep 
+                     <ProcessStep
                         icon={<svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>}
                         title="Step 4: Your Forever Home"
                         description="We provide a seamless and secure purchase process, with post-purchase support to help you and your new friend settle in."
@@ -2068,10 +2080,10 @@ function Chatbot() {
                         </div>
                     </div>
                     <div className="p-2 border-t">
-                        <input 
-                            type="text" 
-                            placeholder="Type your message..." 
-                            className="w-full p-2 border rounded-md" 
+                        <input
+                            type="text"
+                            placeholder="Type your message..."
+                            className="w-full p-2 border rounded-md"
                             value={input}
                             onChange={handleInputChange}
                             onKeyPress={handleKeyPress}
@@ -2080,7 +2092,7 @@ function Chatbot() {
                 </div>
             )}
             {/* Chat Toggle Button */}
-            <button 
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="fixed bottom-6 left-6 bg-[#8B4513] text-white p-4 rounded-full shadow-lg hover:bg-[#63372C] transition-transform hover:scale-110 z-50"
                 aria-label="Toggle Chat"
