@@ -5,18 +5,9 @@ import { getAuth, onAuthStateChanged, signInAnonymously, signOut, signInWithCust
 
 // --- Helper Functions & Configuration ---
 
-// **FINAL FIX:** The Firebase configuration is now hardcoded to ensure a successful connection.
-const firebaseConfig = {
-  apiKey: "AIzaSyD38JKcmqITmGUXN-9j9VRkIxRsdyGP3fs",
-  authDomain: "pawcare-984fd.firebaseapp.com",
-  projectId: "pawcare-984fd",
-  storageBucket: "pawcare-984fd.appspot.com",
-  messagingSenderId: "921796152720",
-  appId: "1:921796152720:web:27161a12d63a03d134b715",
-  measurementId: "G-6ZP58JYZM2"
-};
-
-const appId = 'default-app-id'; // This can remain as is.
+// These variables are provided by the environment. Do not change them.
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 // Initialize Firebase
 let app;
@@ -27,9 +18,8 @@ try {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
     auth = getAuth(app);
-    console.log("Firebase Initialized Successfully with hardcoded config."); // Debugging line
 } catch (e) {
-   console.error("Firebase initialization error:", e);
+    console.error("Firebase initialization error:", e);
 }
 
 
@@ -47,7 +37,7 @@ const useScrollFadeIn = () => {
                 }
             },
             {
-                threshold: 0.1,
+                threshold: 0.1, // Trigger when 10% of the element is visible
             }
         );
 
@@ -100,6 +90,7 @@ const PeekingButton = ({ children, className, ...props }) => {
 
 
 // --- Icon Components ---
+// PERMANENT LOGO - DO NOT CHANGE
 const LogoIcon = ({ className = "h-18 w-20" }) => (
     <img src="https://i.postimg.cc/85K1SxTH/PAWCARE-LOGO-removebg-preview-1.png" alt="PawCare Logo" className={className} />
 );
@@ -113,7 +104,7 @@ const ShieldCheckIcon = ({ className = "w-6 h-6" }) => (<svg className={classNam
 const ChatIcon = ({ className = "w-8 h-8" }) => (<svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>);
 const CartIcon = ({ className = "w-6 h-6" }) => (<svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>);
 
-// --- Sample Data ---
+// --- Sample Data (with updated, breed-specific image galleries) ---
 const sampleDogs = [
     { name: 'Shep', breed: 'German Shepherd', price: 7500, location: 'Delhi', age: 2, gender: 'Male', health: 'Vaccinated', temperament: 'Highly trainable, intelligent, protective', rating: 5, status: 'In Training', gallery: ['https://cdn.britannica.com/79/232779-050-6B0411D7/German-Shepherd-dog-Alsatian.jpg', 'https://cdn.mos.cms.futurecdn.net/Tdom4TwTjsVFLhXrNqnZHS.jpg', 'https://www.akc.org/wp-content/uploads/2017/11/German-Shepherd-on-White-00.jpg'], videoUrl: 'https://www.youtube.com/embed/f4Z-Dl-c_Zs', maintenance: 'high', activity: 'high', trainingProgress: 40, vetChecks: ['Basic obedience training started'] },
     { name: 'Kairo', breed: 'Belgian Malinois', price: 8200, location: 'Mumbai', age: 2, gender: 'Male', health: 'Vaccinated', temperament: 'Very obedient, lighter, faster', rating: 5, status: 'Ready', gallery: ['https://pet-health-content-media.chewy.com/wp-content/uploads/2024/09/11180651/202105iStock-1395878741.jpg', 'https://cdn.britannica.com/85/232785-050-0EE871BE/Belgian-Malinois-dog.jpg', 'https://www.protectiondog.com/cdn/shop/products/ron-rudy-and-raven-269533_1400x.jpg?v=1670013908'], videoUrl: 'https://www.youtube.com/embed/Bg41LajvptE', maintenance: 'medium', activity: 'high', trainingProgress: 85, vetChecks: ['All shots up to date'] },
@@ -514,9 +505,9 @@ function HomePage({ navigateTo, dogs, isLoading, featuredReviews }) {
                     </select>
                     <select name="price" className="p-3 border-gray-300 border rounded-lg w-full focus:ring-2 focus:ring-[#8B4513] focus:border-[#8B4513]" onChange={handleFilterChange}>
                         <option value="">Any Price</option>
-                        <option value="6000">Below ?6,000</option>
-                        <option value="8000">?6,000 - ?8,000</option>
-                        <option value="8001">Above ?8,000</option>
+                        <option value="6000">Below ₹6,000</option>
+                        <option value="8000">₹6,000 - ₹8,000</option>
+                        <option value="8001">Above ₹8,000</option>
                     </select>
                     <select name="sort" value={sortOption} className="p-3 border-gray-300 border rounded-lg w-full focus:ring-2 focus:ring-[#8B4513] focus:border-[#8B4513]" onChange={(e) => setSortOption(e.target.value)}>
                         <option value="default">Sort By</option>
@@ -630,7 +621,7 @@ function DogCard({ dog, navigateTo }) {
                     <span>{dog.location}</span>
                 </div>
                 <div className="mt-4 text-2xl text-gray-800 font-bold">
-                    <span className="text-lg">?</span>{dog.price.toLocaleString('en-IN')}
+                    <span className="text-lg">₹</span>{dog.price.toLocaleString('en-IN')}
                 </div>
             </div>
         </div>
@@ -779,7 +770,7 @@ function DogProfilePage({ dog, navigateTo, userId, favorites, showAlert }) {
                             )}
 
                             <div className="text-4xl font-bold text-[#8B4513] my-8">
-                                ?{dog.price.toLocaleString('en-IN')}
+                                ₹{dog.price.toLocaleString('en-IN')}
                             </div>
 
                             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
@@ -1111,9 +1102,9 @@ function ClientDashboard({ userId, favoritedDogs, purchasedDogs, productOrders, 
                             <div key={order.id} className="p-4 border rounded-lg">
                                 <p className="font-semibold text-gray-700">Order Date: {new Date(order.orderDate.seconds * 1000).toLocaleDateString()}</p>
                                 <ul className="list-disc list-inside mt-2 pl-4">
-                                    {order.items.map((item, index) => <li key={index}>{item.name} - ?{parseInt(item.price).toLocaleString('en-IN')}</li>)}
+                                    {order.items.map((item, index) => <li key={index}>{item.name} - ₹{parseInt(item.price).toLocaleString('en-IN')}</li>)}
                                 </ul>
-                                <p className="font-bold text-right mt-2 text-lg">Total: ?{order.total.toLocaleString('en-IN')}</p>
+                                <p className="font-bold text-right mt-2 text-lg">Total: ₹{order.total.toLocaleString('en-IN')}</p>
                             </div>
                         ))}
                     </div>
@@ -1349,7 +1340,7 @@ function AdminPage({ dogs, inquiries, reviews, productOrders, userId, showAlert 
                                     <ul className="list-disc list-inside mt-2">
                                         {order.items.map((item, index) => <li key={index}>{item.name} - {item.price}</li>)}
                                     </ul>
-                                    <p className="font-bold text-right mt-2">Total: ?{order.total.toLocaleString('en-IN')}</p>
+                                    <p className="font-bold text-right mt-2">Total: ₹{order.total.toLocaleString('en-IN')}</p>
                                 </div>
                             )) : <p className="text-gray-500">No product orders yet.</p>}
                         </div>
@@ -1553,7 +1544,7 @@ function CheckoutPage({ checkoutInfo, navigateTo, userId }) {
                             <div>
                                 <h3 className="font-bold">{dog.name}</h3>
                                 <p className="text-gray-600">{dog.breed}</p>
-                                <p className="font-bold text-lg mt-2">?{dog.price.toLocaleString('en-IN')}</p>
+                                <p className="font-bold text-lg mt-2">₹{dog.price.toLocaleString('en-IN')}</p>
                             </div>
                         </div>
                         <div className="mt-4 text-sm text-gray-500 flex items-center">
@@ -1741,12 +1732,12 @@ function ServicesPage({ userId, showAlert, onPurchase }) {
                                          <div className="border rounded-lg p-4">
                                             <h4 className="font-bold text-lg">Puppy Kickstarter (4 Weeks)</h4>
                                             <p className="text-sm text-gray-500">Socialization, potty training, and basic commands.</p>
-                                            <p className="font-bold text-right text-lg text-[#63372C]">?8,000</p>
+                                            <p className="font-bold text-right text-lg text-[#63372C]">₹8,000</p>
                                         </div>
                                          <div className="border rounded-lg p-4">
                                             <h4 className="font-bold text-lg">Advanced Obedience (6 Weeks)</h4>
-                                            <p className="text-sm text-gray-500">Off-leash commands, distraction training, and more.</p>
-                                            <p className="font-bold text-right text-lg text-[#63372C]">?12,000</p>
+                                            <p className="text-sm text-gray-500">For graduates of our puppy course. Focuses on off-leash commands, distraction training, and more.</p>
+                                            <p className="font-bold text-right text-lg text-[#63372C]">₹12,000</p>
                                         </div>
                                     </div>
                                     <PeekingButton onClick={() => setModal('training')} className="w-full mt-6 bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">Enroll in Training</PeekingButton>
@@ -1796,7 +1787,7 @@ function OurProcessPage() {
             <FadeIn>
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[#63372C] mb-2">Our Commitment to Excellence</h1>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto">We believe that a happy home starts with a healthy, well-adjusted companion. Here�s how we ensure every dog is ready for their new family.</p>
+                    <p className="text-lg text-gray-600 max-w-3xl mx-auto">We believe that a happy home starts with a healthy, well-adjusted companion. Here’s how we ensure every dog is ready for their new family.</p>
                 </div>
             </FadeIn>
 
@@ -1866,17 +1857,17 @@ const GroomingModal = ({ closeModal, userId, showAlert }) => {
                         <div className="border rounded-lg p-3">
                             <h4 className="font-bold">Full Groom</h4>
                             <p className="text-sm text-gray-500">Bath, haircut, nail trim, ear cleaning.</p>
-                            <p className="font-bold text-right text-md text-[#63372C]">?2,500</p>
+                            <p className="font-bold text-right text-md text-[#63372C]">₹2,500</p>
                         </div>
                         <div className="border rounded-lg p-3">
                             <h4 className="font-bold">Bath & Brush</h4>
                             <p className="text-sm text-gray-500">A thorough wash and brush-out.</p>
-                            <p className="font-bold text-right text-md text-[#63372C]">?1,500</p>
+                            <p className="font-bold text-right text-md text-[#63372C]">₹1,500</p>
                         </div>
                         <div className="border rounded-lg p-3">
                             <h4 className="font-bold">Puppy's First Groom</h4>
                             <p className="text-sm text-gray-500">A gentle introduction to grooming.</p>
-                            <p className="font-bold text-right text-md text-[#63372C]">?1,200</p>
+                            <p className="font-bold text-right text-md text-[#63372C]">₹1,200</p>
                         </div>
                     </div>
                 </div>
@@ -1966,12 +1957,12 @@ const TrainingModal = ({ closeModal, userId, showAlert }) => {
                          <div className="border rounded-lg p-3">
                             <h4 className="font-bold">Puppy Kickstarter (4 Weeks)</h4>
                             <p className="text-sm text-gray-500">Essential for new owners. Covers socialization, potty training, and basic commands like sit, stay, and come.</p>
-                            <p className="font-bold text-right text-md text-[#63372C]">?8,000</p>
+                            <p className="font-bold text-right text-md text-[#63372C]">₹8,000</p>
                         </div>
                          <div className="border rounded-lg p-3">
                             <h4 className="font-bold">Advanced Obedience (6 Weeks)</h4>
                             <p className="text-sm text-gray-500">For graduates of our puppy course. Focuses on off-leash commands, distraction training, and more.</p>
-                            <p className="font-bold text-right text-md text-[#63372C]">?12,000</p>
+                            <p className="font-bold text-right text-md text-[#63372C]">₹12,000</p>
                         </div>
                     </div>
                 </div>
@@ -2011,7 +2002,7 @@ const ShopModal = ({ closeModal, showAlert, onPurchase }) => {
                         <h3 className="font-bold text-lg text-[#63372C]">{product.name}</h3>
                         <p className="text-gray-600 text-sm flex-grow">{product.description}</p>
                         <div className="flex justify-between items-center mt-4">
-                            <p className="font-bold text-xl text-[#8B4513]">?{parseInt(product.price).toLocaleString('en-IN')}</p>
+                            <p className="font-bold text-xl text-[#8B4513]">₹{parseInt(product.price).toLocaleString('en-IN')}</p>
                             <PeekingButton onClick={() => { onPurchase(product); closeModal(); }} className="bg-[#8B4513] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#63372C] transition-colors text-sm">Buy Now</PeekingButton>
                         </div>
                     </div>
@@ -2089,7 +2080,7 @@ function Chatbot() {
                 </div>
             )}
             {/* Chat Toggle Button */}
-            <button
+            <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className="fixed bottom-6 left-6 bg-[#8B4513] text-white p-4 rounded-full shadow-lg hover:bg-[#63372C] transition-transform hover:scale-110 z-50"
                 aria-label="Toggle Chat"
@@ -2098,4 +2089,4 @@ function Chatbot() {
             </button>
         </div>
     );
-} 
+}
